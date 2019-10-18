@@ -22,3 +22,21 @@ BLACK = (0, 0, 0)
 # Creates window of specified size and set the game window color
 game_screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 game_screen.fill(WHITE)
+
+#Main game loop
+while not is_game_over:
+    
+    # Events usually mouse movement, clicks, exits
+    for event in pygame.event.get():
+
+        # if quit event, end the game
+        if event.type == pygame.QUIT:
+            is_game_over = True
+        
+        # Update graphics
+        pygame.display.update()
+        clock.tick(TICK_RATE)
+
+# Quit pygame and the program
+pygame.quit()
+quit()
