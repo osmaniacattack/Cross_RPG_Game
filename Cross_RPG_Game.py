@@ -18,6 +18,8 @@ clock = pygame.time.Clock()
 pygame.font.init()
 font = pygame.font.SysFont('comicsans', 75)
 
+############### GAME CLASS ##################
+
 class Game:
     TICK_RATE = 60 #Rate of 60 like FPS
     
@@ -34,6 +36,10 @@ class Game:
 
     def run_game_loop(self):
         is_game_over = False
+        direction = 0
+
+
+        player_character = PlayerCharacter('player.png', 375, 700, 50, 50)
 
         #Main game loop
         while not is_game_over:
@@ -45,7 +51,28 @@ class Game:
                 if event.type == pygame.QUIT:
                     is_game_over = True
 
+                # Detect when key is pressed down
+                elif event.type == pygame.KEYDOWN:
+                # Move up if up key is pressed
+                    if event.key == pygame.K_UP:
+                        direction = 1
+                # Move down if down key pressed
+                    elif event.key == pygame.K_DOWN:
+                        direction = -1
+                # Detect when key is released
+                elif event.type == pygame.KEYUP:
+                # Stop movement when key no longer pressed
+                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                        direction = 0
+
                 print(event)
+
+            # Redraw the screen to imitate animation
+            self.game_screen.fill(WHITE)
+            # Update player position
+            player_character.move(direction)
+            # Draw player at new position
+            player_character.draw(self.game_screen)
                 
                 #pygame.draw.rect(game_screen, BLACK, [350, 350, 100, 100])
                 #pygame.draw.circle(game_screen, BLACK, (400, 300), 50)
@@ -53,9 +80,11 @@ class Game:
                 # Draw the player image on top of the screen at (x, y) position
                 # game_screen.blit(player_image, (375, 375))
 
-                # Update graphics
-                pygame.display.update()
-                clock.tick(self.TICK_RATE)
+            # Update graphics
+            pygame.display.update()
+            clock.tick(self.TICK_RATE)
+
+############### GAME OBJECT CLASS ##################
 
 # Generic game object class to be subclassed by other objects in the game
 class GameObject:
@@ -71,6 +100,24 @@ class GameObject:
     # Draw the object by blitting it onto game screen
     def draw(self, background):
         background.blit(self.image, (self.x_pos, self.y_pos))
+
+############### PLAYER CHARACTER CLASS ##################
+
+# Class to represent the character controlled by the player
+class PlayerCharacter(GameObject):
+
+    # Tiles to move per second
+    SPEED = 10
+
+    def __init__(self, image_path, x, y, width, height):
+        super().__init__(image_path, x, y, width, height)
+    
+    # Move function will move character up if direction > 0 and down if < 0
+    def move(self, direction):
+        if direction > 0:
+            self.y_pos -= self.SPEED
+        elif direction < 0:
+            self.y_pos += self.SPEED
 
 pygame.init()
 
