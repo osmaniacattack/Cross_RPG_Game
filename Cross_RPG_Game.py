@@ -28,6 +28,7 @@ pygame.display.set_caption(SCREEN_TITLE)
 
 # Load player image from file directory
 player_image = pygame.image.load('player.png')
+# Scale the image up
 player_image = pygame.transform.scale(player_image, (50, 50))
 
 #Main game loop
