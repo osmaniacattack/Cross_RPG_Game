@@ -22,7 +22,7 @@ class Game:
     TICK_RATE = 60 
     
     # Constructor for game class w/ width, height, and title
-    def __init__(self, title, width, height):
+    def __init__(self, image_path, title, width, height):
         self.title = title
         self.width = width
         self.height = height
@@ -32,15 +32,25 @@ class Game:
         self.game_screen.fill(WHITE)
         pygame.display.set_caption(SCREEN_TITLE)
 
-    def run_game_loop(self):
+        background_image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(background_image, (width, height))
+
+    def run_game_loop(self, level_speed):
         is_game_over = False
+        did_win = False
         direction = 0
 
 
         player_character = PlayerCharacter('player.png', 375, 700, 50, 50)
         enemy_0 = NonPlayerCharacter('enemy.png', 20, 600, 50, 50)
+        enemy_0.SPEED *= level_speed
+
         enemy_1 = NonPlayerCharacter('enemy.png', 30, 400, 50, 50)
+        enemy_1.SPEED *= level_speed
+
         enemy_2 = NonPlayerCharacter('enemy.png', 40, 200, 50, 50)
+        enemy_2.SPEED *= level_speed
+
         treasure = GameObject('treasure.png', 375, 50, 50, 50)
 
         #Main game loop
@@ -71,6 +81,7 @@ class Game:
 
             # Redraw the screen to imitate animation
             self.game_screen.fill(WHITE)
+            self.game_screen.blit(self.image, (0, 0))
             # Update player position
             player_character.move(direction, self.height)
             # Draw player at new position
@@ -79,24 +90,45 @@ class Game:
             # Move/Draw enemy
             enemy_0.move(self.width)
             enemy_0.draw(self.game_screen)
-            enemy_1.move(self.width)
-            enemy_1.draw(self.game_screen)
-            enemy_2.move(self.width)
-            enemy_2.draw(self.game_screen)
+            
+            if level_speed > 2:
+                enemy_1.move(self.width)
+                enemy_1.draw(self.game_screen)
+            if level_speed > 4:
+                enemy_2.move(self.width)
+                enemy_2.draw(self.game_screen)
 
             treasure.draw(self.game_screen)
 
             enemies = [enemy_0, enemy_1, enemy_2]
             if player_character.detect_collision(treasure):
                 is_game_over = True
+                did_win = True
+                text = font.render('You win! :)', True, BLACK)
+                self.game_screen.blit(text, (300, 350))
+                pygame.display.update()
+                clock.tick(1)
+                break
+
             else:
                 for enemy in enemies:
                     if player_character.detect_collision(enemy):
                         is_game_over = True
-
+                        did_win = False
+                        text = font.render('You lose! :(', True, BLACK)
+                        self.game_screen.blit(text, (300, 350))
+                        pygame.display.update()
+                        clock.tick(1)
+                        break
+            
             # Update graphics
             pygame.display.update()
             clock.tick(self.TICK_RATE)
+        
+        if did_win:
+            self.run_game_loop(level_speed + 0.5)
+        else:
+            return
 
 ############### GAME OBJECT CLASS ##################
 
@@ -173,8 +205,8 @@ class NonPlayerCharacter(GameObject):
 
 pygame.init()
 
-new_game = Game(SCREEN_TITLE, SCREEN_WIDTH, SCREEN_HEIGHT)
-new_game.run_game_loop()
+new_game = Game('background.png',SCREEN_TITLE, SCREEN_WIDTH, SCREEN_HEIGHT)
+new_game.run_game_loop(1)
 
 # Quit pygame and the program
 pygame.quit()
