@@ -1,7 +1,3 @@
-# Pygame development 1
-# Start the basic game set up
-# Set up the display
-
 import pygame
 
 # Screen Settings
@@ -21,7 +17,9 @@ font = pygame.font.SysFont('comicsans', 75)
 ############### GAME CLASS ##################
 
 class Game:
-    TICK_RATE = 60 #Rate of 60 like FPS
+
+    #Rate of 60 like FPS
+    TICK_RATE = 60 
     
     # Constructor for game class w/ width, height, and title
     def __init__(self, title, width, height):
@@ -40,6 +38,7 @@ class Game:
 
 
         player_character = PlayerCharacter('player.png', 375, 700, 50, 50)
+        enemy_0 = NonPlayerCharacter('enemy.png', 20, 600, 50, 50)
 
         #Main game loop
         while not is_game_over:
@@ -73,12 +72,10 @@ class Game:
             player_character.move(direction)
             # Draw player at new position
             player_character.draw(self.game_screen)
-                
-                #pygame.draw.rect(game_screen, BLACK, [350, 350, 100, 100])
-                #pygame.draw.circle(game_screen, BLACK, (400, 300), 50)
 
-                # Draw the player image on top of the screen at (x, y) position
-                # game_screen.blit(player_image, (375, 375))
+            # Move/Draw enemy
+            enemy_0.move(self.width)
+            enemy_0.draw(self.game_screen)
 
             # Update graphics
             pygame.display.update()
@@ -97,6 +94,9 @@ class GameObject:
         self.x_pos = x
         self.y_pos = y
 
+        self.width = width
+        self.height = height
+
     # Draw the object by blitting it onto game screen
     def draw(self, background):
         background.blit(self.image, (self.x_pos, self.y_pos))
@@ -113,11 +113,32 @@ class PlayerCharacter(GameObject):
         super().__init__(image_path, x, y, width, height)
     
     # Move function will move character up if direction > 0 and down if < 0
-    def move(self, direction):
+    def move(self, direction, max_height):
         if direction > 0:
             self.y_pos -= self.SPEED
         elif direction < 0:
             self.y_pos += self.SPEED
+        #stop player from going past bottom
+        if self.y_pos >= max_height - 20:
+            self.y_pos = max_height - 20
+
+############### ENEMY CHARACTER CLASS ##################
+
+# Class to represent enemy
+class NonPlayerCharacter(GameObject):
+    # Tiles per second
+    SPEED = 10
+
+    def __init__(self, image_path, x, y, width, height):
+        super().__init__(image_path, x, y, width, height)
+
+    # Move function will move character right once it hits the far left and vice versa
+    def move(self, max_width):
+        if self.x_pos <= 20:
+            self.SPEED = abs(self.SPEED)
+        elif self.x_pos >= max_width - 20:
+            self.SPEED = -abs(self.SPEED)
+        self.x_pos += self.SPEED
 
 pygame.init()
 
