@@ -39,6 +39,9 @@ class Game:
 
         player_character = PlayerCharacter('player.png', 375, 700, 50, 50)
         enemy_0 = NonPlayerCharacter('enemy.png', 20, 600, 50, 50)
+        enemy_1 = NonPlayerCharacter('enemy.png', 30, 400, 50, 50)
+        enemy_2 = NonPlayerCharacter('enemy.png', 40, 200, 50, 50)
+        treasure = GameObject('treasure.png', 375, 50, 50, 50)
 
         #Main game loop
         while not is_game_over:
@@ -69,13 +72,27 @@ class Game:
             # Redraw the screen to imitate animation
             self.game_screen.fill(WHITE)
             # Update player position
-            player_character.move(direction)
+            player_character.move(direction, self.height)
             # Draw player at new position
             player_character.draw(self.game_screen)
 
             # Move/Draw enemy
             enemy_0.move(self.width)
             enemy_0.draw(self.game_screen)
+            enemy_1.move(self.width)
+            enemy_1.draw(self.game_screen)
+            enemy_2.move(self.width)
+            enemy_2.draw(self.game_screen)
+
+            treasure.draw(self.game_screen)
+
+            enemies = [enemy_0, enemy_1, enemy_2]
+            if player_character.detect_collision(treasure):
+                is_game_over = True
+            else:
+                for enemy in enemies:
+                    if player_character.detect_collision(enemy):
+                        is_game_over = True
 
             # Update graphics
             pygame.display.update()
@@ -119,8 +136,22 @@ class PlayerCharacter(GameObject):
         elif direction < 0:
             self.y_pos += self.SPEED
         #stop player from going past bottom
-        if self.y_pos >= max_height - 20:
-            self.y_pos = max_height - 20
+        if self.y_pos >= max_height - 40:
+            self.y_pos = max_height - 40
+    
+    # return false (no collision) if x/y do not overlap and true otherwise
+    def detect_collision(self, other_body):
+        if self.y_pos > other_body.y_pos + other_body.height:
+            return False
+        elif self.y_pos + self.height < other_body.y_pos:
+            return False
+        
+        if self.x_pos > other_body.x_pos + other_body.width:
+            return False
+        elif self.x_pos + self.width < other_body.x_pos:
+            return False
+
+        return True
 
 ############### ENEMY CHARACTER CLASS ##################
 
@@ -136,7 +167,7 @@ class NonPlayerCharacter(GameObject):
     def move(self, max_width):
         if self.x_pos <= 20:
             self.SPEED = abs(self.SPEED)
-        elif self.x_pos >= max_width - 20:
+        elif self.x_pos >= max_width - 40:
             self.SPEED = -abs(self.SPEED)
         self.x_pos += self.SPEED
 
