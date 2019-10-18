@@ -6,9 +6,11 @@ import pygame
 
 pygame.init()
 
-# Screen Size
+# Screen Settings
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
+
+SCREEN_TITLE = 'Crossy RPG'
 
 # Clock used to update game events and frames
 clock = pygame.time.Clock()
@@ -22,6 +24,7 @@ BLACK = (0, 0, 0)
 # Creates window of specified size and set the game window color
 game_screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 game_screen.fill(WHITE)
+pygame.display.set_caption(SCREEN_TITLE)
 
 #Main game loop
 while not is_game_over:
@@ -32,6 +35,7 @@ while not is_game_over:
         # if quit event, end the game
         if event.type == pygame.QUIT:
             is_game_over = True
+        print(event)
         
         # Update graphics
         pygame.display.update()
