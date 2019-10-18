@@ -28,7 +28,7 @@ class Game:
         self.height = height
 
         # Creates window of specified size and set the game window color
-        self.game_screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.game_screen = pygame.display.set_mode((width, height))
         self.game_screen.fill(WHITE)
         pygame.display.set_caption(SCREEN_TITLE)
 
@@ -55,7 +55,22 @@ class Game:
 
                 # Update graphics
                 pygame.display.update()
-                clock.tick(TICK_RATE)
+                clock.tick(self.TICK_RATE)
+
+# Generic game object class to be subclassed by other objects in the game
+class GameObject:
+
+    def __init__(self, image_path, x, y, width, height):
+        object_image = pygame.image.load(image_path)
+        # Scale image
+        self.image = pygame.transform.scale(object_image, (width, height))
+
+        self.x_pos = x
+        self.y_pos = y
+
+    # Draw the object by blitting it onto game screen
+    def draw(self, background):
+        background.blit(self.image, (self.x_pos, self.y_pos))
 
 pygame.init()
 
